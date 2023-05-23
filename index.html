@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>htmlメモ</title>
+</head>
+ 
+<body>
+    <script type="text/javascript">
+      
+      function buttonClick(){
+      var savehtml = new XMLSerializer().serializeToString(document);
+      var blob = new Blob([savehtml], { "type" : "text/plain" });
+      let link = document.createElement('a'); 
+        link.href = URL.createObjectURL(blob);
+        link.download = 'SavePage.html';
+        link.click(); 
+      }
+  </script>
+
+<!--
+<a href="javascript:(function(b,c,d,e,f,g,h,a){g=c.createElement('div').appendChild(c.getElementsByTagName('html')[0].cloneNode(true));f=g.querySelectorAll('[href],[src]');for(var i=0,n=f.length;i<n;i++){if(f[i].href){f[i].href=f[i].href}if(f[i].src){f[i].src=f[i].src}}h=g.innerHTML;e=c.doctype;e='<!DOCTYPE '+e.name+(e.publicId?' PUBLIC &quot;'+e.publicId+'&quot;':'')+(e.systemID?' &quot;'+e.systemID+'&quot;':'')+'>';a=c.createElement('a');a.download=decodeURI(d.pathname+d.hash).replace(/\//g,'__').replace(/#/g,'--')+'.html';a.href=(b.URL||b.webkitURL).createObjectURL(new Blob([e,'\n',h]));a.click()})(window,document,location);" style="display:inline-block;padding:8px 10px;font-size:22px;font-weight:bold;line-height:1;border:1px solid #2c819b;border-radius:4px;text-decoration:none;cursor:move;">ページ保存</a>
+-->
+
+ <input type="button" value="ファイル出力" onclick="buttonClick();"/>
+
+<br><br>
+<div contentEditable="true">ここは編集できます</div>
+
+<script>
+</script>
+</body>
+</html>
