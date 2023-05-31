@@ -7,7 +7,21 @@
  
 <body>
     <script type="text/javascript">
-      
+     
+        window.onload = function(){
+            var textvalue = localStorage.getItem('text');
+            if (textvalue) {
+             var mydiv = document.getElementById("textarea");
+              mydiv.innerHTML = textvalue;
+            }else{
+            }
+        }     
+
+     window.onbeforeunload = function() {
+      const textareavalue = document.getElementById('textarea');
+      localStorage.setItem('text', textareavalue.innerHTML);
+        }
+     
       function buttonClick(){
       var savehtml = new XMLSerializer().serializeToString(document);
       var blob = new Blob([savehtml], { "type" : "text/plain" });
@@ -25,7 +39,7 @@
  <input type="button" value="ファイル出力" onclick="buttonClick();"/>
 
 <br><br>
-<div contentEditable="true" style="outline: none;">ここは編集できます</div>
+<div id="textarea" contentEditable="true" style="outline: none;">ここは編集できます</div>
 
 <script>
 </script>
