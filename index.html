@@ -27,7 +27,8 @@
       var blob = new Blob([savehtml], { "type" : "text/plain" });
       let link = document.createElement('a'); 
         link.href = URL.createObjectURL(blob);
-        link.download = 'SavePage.html';
+        link.download = document.getElementById("pagetitle").value;
+//        'SavePage.html'
         link.click(); 
       }
   </script>
@@ -37,6 +38,9 @@
 -->
 
  <input type="button" value="ファイル出力" onclick="buttonClick();"/>
+
+<br>
+<input type="text" id="pagetitle" size="30">
 
 <br><br>
 <div id="textarea" contentEditable="true" style="outline: none;">ここは編集できます</div>
