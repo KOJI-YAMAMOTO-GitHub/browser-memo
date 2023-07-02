@@ -10,10 +10,14 @@
      
         window.onload = function(){
             var textvalue = localStorage.getItem('text');
-            if (textvalue) {
+            const textareavalue = document.getElementById('textarea');
+            if(textareavalue.innerHTML){
+            }else if (textvalue) {
              var mydiv = document.getElementById("textarea");
               mydiv.innerHTML = textvalue;
             }else{
+              var mydiv = document.getElementById("textarea");
+              mydiv.innerHTML = "編集可能エリア";
             }
         }     
 
@@ -31,19 +35,27 @@
 //        'SavePage.html'
         link.click(); 
       }
-  </script>
+      function localStrageClear(){
+        localStorage.removeItem('text');
+        var mydiv = document.getElementById("textarea");
+        mydiv.innerHTML = "";
+
+      }
+
+</script>
 
 <!--
 <a href="javascript:(function(b,c,d,e,f,g,h,a){g=c.createElement('div').appendChild(c.getElementsByTagName('html')[0].cloneNode(true));f=g.querySelectorAll('[href],[src]');for(var i=0,n=f.length;i<n;i++){if(f[i].href){f[i].href=f[i].href}if(f[i].src){f[i].src=f[i].src}}h=g.innerHTML;e=c.doctype;e='<!DOCTYPE '+e.name+(e.publicId?' PUBLIC &quot;'+e.publicId+'&quot;':'')+(e.systemID?' &quot;'+e.systemID+'&quot;':'')+'>';a=c.createElement('a');a.download=decodeURI(d.pathname+d.hash).replace(/\//g,'__').replace(/#/g,'--')+'.html';a.href=(b.URL||b.webkitURL).createObjectURL(new Blob([e,'\n',h]));a.click()})(window,document,location);" style="display:inline-block;padding:8px 10px;font-size:22px;font-weight:bold;line-height:1;border:1px solid #2c819b;border-radius:4px;text-decoration:none;cursor:move;">ページ保存</a>
 -->
 
  <input type="button" value="ファイル出力" onclick="buttonClick();"/>
+ <input type="button" value="localStorage & text Clear" onclick="localStrageClear();"/>
 
 <br>
 <input type="text" id="pagetitle" size="30" value="SavePage.html">
 
 <br><br>
-<div id="textarea" contentEditable="true" style="outline: none;">ここは編集できます</div>
+<div id="textarea" contentEditable="true" style="outline: none;"></div>
 
 <script>
 </script>
