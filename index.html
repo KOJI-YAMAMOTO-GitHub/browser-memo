@@ -3,61 +3,64 @@
 <head>
 <meta charset="utf-8">
 <title>htmlメモ</title>
+<style>
+    /* テキストエリアのスタイルを定義 */
+    #textarea {
+        outline: none;
+        width: 100%;            /* 横幅を画面いっぱいに */
+        min-height: 200px;      /* 最低限の高さ（クリックしやすくするため） */
+        white-space: pre-wrap;  /* 改行やスペースを維持しつつ、端で折り返す */
+        word-break: break-all;  /* 長い英数字でも強制的に端で折り返す */
+        overflow-wrap: break-word; /* ブラウザの端で単語を区切る */
+    }
+</style>
 </head>
- 
+
 <body>
     <script type="text/javascript">
-     
         window.onload = function(){
             var textvalue = localStorage.getItem('text');
             const textareavalue = document.getElementById('textarea');
             if(textareavalue.innerHTML){
+                // すでにHTML内に記述がある場合は何もしない
             }else if (textvalue) {
-             var mydiv = document.getElementById("textarea");
-              mydiv.innerHTML = textvalue;
+                textareavalue.innerHTML = textvalue;
             }else{
-              var mydiv = document.getElementById("textarea");
-              mydiv.innerHTML = "編集可能エリア";
+                textareavalue.innerHTML = "編集可能エリア";
             }
         }     
 
-     window.onbeforeunload = function() {
-      const textareavalue = document.getElementById('textarea');
-      localStorage.setItem('text', textareavalue.innerHTML);
+        window.onbeforeunload = function() {
+            const textareavalue = document.getElementById('textarea');
+            localStorage.setItem('text', textareavalue.innerHTML);
         }
      
-      function buttonClick(){
-      var savehtml = new XMLSerializer().serializeToString(document);
-      var blob = new Blob([savehtml], { "type" : "text/plain" });
-      let link = document.createElement('a'); 
-        link.href = URL.createObjectURL(blob);
-        link.download = document.getElementById("pagetitle").value;
-//        'SavePage.html'
-        link.click(); 
-      }
-      function localStrageClear(){
-        localStorage.removeItem('text');
-        var mydiv = document.getElementById("textarea");
-        mydiv.innerHTML = "";
+        function buttonClick(){
+            var savehtml = new XMLSerializer().serializeToString(document);
+            var blob = new Blob([savehtml], { "type" : "text/plain" });
+            let link = document.createElement('a'); 
+            link.href = URL.createObjectURL(blob);
+            link.download = document.getElementById("pagetitle").value;
+            link.click(); 
+        }
 
-      }
+        function localStrageClear(){
+            if(confirm("データを消去しますか？")){
+                localStorage.removeItem('text');
+                var mydiv = document.getElementById("textarea");
+                mydiv.innerHTML = "";
+            }
+        }
+    </script>
 
-</script>
+    <input type="button" value="ファイル出力" onclick="buttonClick();"/>
+    <input type="button" value="localStorage & text Clear" onclick="localStrageClear();"/>
 
-<!--
-<a href="javascript:(function(b,c,d,e,f,g,h,a){g=c.createElement('div').appendChild(c.getElementsByTagName('html')[0].cloneNode(true));f=g.querySelectorAll('[href],[src]');for(var i=0,n=f.length;i<n;i++){if(f[i].href){f[i].href=f[i].href}if(f[i].src){f[i].src=f[i].src}}h=g.innerHTML;e=c.doctype;e='<!DOCTYPE '+e.name+(e.publicId?' PUBLIC &quot;'+e.publicId+'&quot;':'')+(e.systemID?' &quot;'+e.systemID+'&quot;':'')+'>';a=c.createElement('a');a.download=decodeURI(d.pathname+d.hash).replace(/\//g,'__').replace(/#/g,'--')+'.html';a.href=(b.URL||b.webkitURL).createObjectURL(new Blob([e,'\n',h]));a.click()})(window,document,location);" style="display:inline-block;padding:8px 10px;font-size:22px;font-weight:bold;line-height:1;border:1px solid #2c819b;border-radius:4px;text-decoration:none;cursor:move;">ページ保存</a>
--->
+    <br>
+    <input type="text" id="pagetitle" size="30" value="SavePage.html">
 
- <input type="button" value="ファイル出力" onclick="buttonClick();"/>
- <input type="button" value="localStorage & text Clear" onclick="localStrageClear();"/>
+    <br><br>
+    <div id="textarea" contentEditable="true"></div>
 
-<br>
-<input type="text" id="pagetitle" size="30" value="SavePage.html">
-
-<br><br>
-<div id="textarea" contentEditable="true" style="outline: none;"></div>
-
-<script>
-</script>
 </body>
 </html>
