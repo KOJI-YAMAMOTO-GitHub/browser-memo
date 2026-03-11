@@ -18,7 +18,7 @@
             font-size: 16px;
             margin-bottom: 10px;
             cursor: pointer;
-            border: 1px solid #ccc; /* 見やすくするため少し線を付けました */
+            border: 1px solid #ccc;
             background: #eee;
         }
 
@@ -28,7 +28,7 @@
             padding: 8px;
             font-size: 16px;
             margin-bottom: 15px;
-            border: none;
+            border: 1px solid #ccc;
         }
 
         #textarea {
@@ -38,7 +38,7 @@
             padding: 10px;
             box-sizing: border-box;
             background-color: #fff;
-            border: none;
+            border: 1px solid #ddd; /* 枠線を表示 */
             border-radius: 4px;
             font-size: 18px;
             white-space: pre-wrap;
@@ -48,12 +48,9 @@
 
         /* --- 画像リサイズ用の設定 --- */
         #textarea img {
-            display: inline-block;
-            vertical-align: bottom;
-            resize: both;      /* 縦横両方のリサイズを許可 */
-            overflow: auto;    /* リサイズ機能に必須 */
             max-width: 100%;   /* 画面からはみ出さないように制限 */
-            border: 1px dashed #ccc; /* 編集可能であることがわかるように点線を表示 */
+            height: auto;      /* アスペクト比を維持 */
+            cursor: nwse-resize; /* マウスを乗せた時にリサイズ可能っぽく見せる */
         }
     </style>
 </head>
@@ -68,9 +65,9 @@
             }else if (textvalue) {
                 textareavalue.innerHTML = textvalue;
             }else{
-                textareavalue.innerHTML = "編集可能エリア";
+                textareavalue.innerHTML = "ここに画像を貼り付けたり、文字を入力したりできます。";
             }
-        }     
+        }      
 
         window.onbeforeunload = function() {
             const textareavalue = document.getElementById('textarea');
@@ -94,13 +91,16 @@
             }
         }
 
-        // ペースト時に画像が貼り付けられた場合、自動でスタイルを適用する補助処理
+        // ペースト時の処理を修正
         document.addEventListener('paste', function (e) {
+            // 貼り付け直後に画像が選択状態になるように少し待つ
             setTimeout(() => {
                 const images = document.querySelectorAll('#textarea img');
                 images.forEach(img => {
-                    if (!img.style.width) {
-                        img.style.width = "200px"; // 初期サイズを指定（お好みで）
+                    // サイズ固定を解除（元のサイズで表示）
+                    // もし初期サイズを決めたい場合は、ここを width = '80%' などに変更してください
+                    if (!img.style.width && !img.getAttribute('width')) {
+                        img.style.maxWidth = "100%"; 
                     }
                 });
             }, 10);
