@@ -4,22 +4,35 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>htmlメモ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         body {
-            font-family: sans-serif;
+            font-family: "Sawarabi Mincho", serif;
             font-size: 16px; 
-            line-height: 1.5;
+            line-height: 1.2;
             padding: 10px;
             margin: 0;
         }
 
+        .controls {
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
         input[type="button"] {
             padding: 10px 15px;
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 14px;
             cursor: pointer;
             border: 1px solid #ccc;
             background: #eee;
+            border-radius: 4px;
+/*            font-family: "Sawarabi Mincho", serif;*/
         }
 
         #pagetitle {
@@ -29,76 +42,109 @@
             font-size: 16px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
+            font-family: "Sawarabi Mincho", serif;
         }
 
         #textarea {
             outline: none;
             width: 100%;
-            min-height: 300px;
-            padding: 10px;
+            min-height: 400px;
+            padding: 10px 0;
             box-sizing: border-box;
             background-color: #fff;
-            border: 1px solid #ddd; /* 枠線を表示 */
-            border-radius: 4px;
+            border: none;
             font-size: 18px;
             white-space: pre-wrap;
             word-break: break-all;
             overflow-wrap: break-word;
+/*            font-family: "Sawarabi Mincho", serif;*/
         }
 
-        /* --- 画像リサイズ用の設定 --- */
         #textarea img {
-            max-width: 100%;   /* 画面からはみ出さないように制限 */
-            height: auto;      /* アスペクト比を維持 */
-            cursor: nwse-resize; /* マウスを乗せた時にリサイズ可能っぽく見せる */
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
 
 <body>
-    <script type="text/javascript">
-        window.onload = function(){
-            var textvalue = localStorage.getItem('text');
-            const textareavalue = document.getElementById('textarea');
-            if(textareavalue.innerHTML.trim()){
-                // すでに記述がある場合は何もしない
-            }else if (textvalue) {
-                textareavalue.innerHTML = textvalue;
-            }else{
-                textareavalue.innerHTML = "ここに画像を貼り付けたり、文字を入力したりできます。";
-            }
-        }      
+    <div class="controls">
+        <input type="button" value="HTML出力" onclick="exportHTML();"/>
+        <input type="button" value="PDF出力" onclick="exportPDF();"/>
+        <input type="button" value="画像出力(PNG)" onclick="exportImage();"/>
+        <input type="button" value="全消去" onclick="localStrageClear();"/>
+    </div>
 
-        window.onbeforeunload = function() {
-            const textareavalue = document.getElementById('textarea');
-            localStorage.setItem('text', textareavalue.innerHTML);
-        }
+    <hr>
+    <label style="font-size: 12px; color: #666;">保存ファイル名：</label><br>
+    <input type="text" id="pagetitle" value="MyNote">
+
+    <hr>
+    <div id="textarea" contentEditable="true"></div>
+
+    <script type="text/javascript">
+        const editor = document.getElementById('textarea');
+        const titleInput = document.getElementById('pagetitle');
+
+        window.addEventListener('load', function(){
+            const textvalue = localStorage.getItem('text');
+            if(!editor.innerHTML.trim()){
+                if (textvalue) {
+                    editor.innerHTML = textvalue;
+                } else {
+                    editor.innerHTML = "ここに内容を入力してください。";
+                }
+            }
+        });
+
+        window.addEventListener('beforeunload', function() {
+            localStorage.setItem('text', editor.innerHTML);
+        });
      
-        function buttonClick(){
-            var savehtml = new XMLSerializer().serializeToString(document);
-            var blob = new Blob([savehtml], { "type" : "text/html" });
+        function exportHTML(){
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { "type" : "text/html" });
+            saveFile(URL.createObjectURL(blob), titleInput.value + ".html");
+        }
+
+        function exportPDF() {
+            const opt = {
+                margin:       10,
+                filename:     titleInput.value + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(editor).save();
+        }
+
+        function exportImage() {
+            html2canvas(editor, {
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                saveFile(canvas.toDataURL("image/png"), titleInput.value + ".png");
+            });
+        }
+
+        function saveFile(url, filename) {
             let link = document.createElement('a'); 
-            link.href = URL.createObjectURL(blob);
-            link.download = document.getElementById("pagetitle").value;
-            link.click(); 
+            link.href = url;
+            link.download = filename;
+            link.click();
         }
 
         function localStrageClear(){
             if(confirm("データを消去しますか？")){
                 localStorage.removeItem('text');
-                var mydiv = document.getElementById("textarea");
-                mydiv.innerHTML = "";
+                editor.innerHTML = "";
             }
         }
 
-        // ペースト時の処理を修正
         document.addEventListener('paste', function (e) {
-            // 貼り付け直後に画像が選択状態になるように少し待つ
             setTimeout(() => {
-                const images = document.querySelectorAll('#textarea img');
+                const images = editor.querySelectorAll('img');
                 images.forEach(img => {
-                    // サイズ固定を解除（元のサイズで表示）
-                    // もし初期サイズを決めたい場合は、ここを width = '80%' などに変更してください
                     if (!img.style.width && !img.getAttribute('width')) {
                         img.style.maxWidth = "100%"; 
                     }
@@ -106,16 +152,5 @@
             }, 10);
         });
     </script>
-
-    <input type="button" value="ファイル出力" onclick="buttonClick();"/>
-    <input type="button" value="全消去" onclick="localStrageClear();"/>
-
-    <hr>
-    <label style="font-size: 14px; color: #666;">保存ファイル名：</label><br>
-    <input type="text" id="pagetitle" value="SavePage.html">
-
-    <hr>
-    <div id="textarea" contentEditable="true"></div>
-
 </body>
 </html>
